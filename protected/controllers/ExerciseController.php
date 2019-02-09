@@ -1,6 +1,8 @@
 <?php
 
-class UsersController extends Controller
+use helpers\DateTimeHelper;
+
+class ExerciseController extends Controller
 {
     /**
      * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
@@ -13,10 +15,10 @@ class UsersController extends Controller
      */
     public function filters()
     {
-        return array(
+        return [
             'accessControl', // perform access control for CRUD operations
             'postOnly + delete', // we only allow deletion via POST request
-        );
+        ];
     }
 
     /**
@@ -26,14 +28,16 @@ class UsersController extends Controller
      */
     public function accessRules()
     {
-        return array(
-            array('allow',
-                'users' => array('tema'),
-            ),
-            array('deny',  // deny all users
-                'users' => array('*'),
-            ),
-        );
+        return [
+            [
+                'allow',
+                'users' => ['tema'],
+            ],
+            [
+                'deny',  // deny all users
+                'users' => ['*'],
+            ],
+        ];
     }
 
     /**
@@ -42,9 +46,9 @@ class UsersController extends Controller
      */
     public function actionView($id)
     {
-        $this->render('view', array(
+        $this->render('view', [
             'model' => $this->loadModel($id),
-        ));
+        ]);
     }
 
     /**
@@ -53,21 +57,37 @@ class UsersController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Users;
+        $model = new Exercise;
 
         // Uncomment the following line if AJAX validation is needed
         // $this->performAjaxValidation($model);
 
-        if (isset($_POST['Users'])) {
-            $model->attributes = $_POST['Users'];
-            $model->password = CPasswordHelper::hashPassword($model->password);
-            if ($model->save())
-                $this->redirect(array('view', 'id' => $model->id));
+        if (isset($_POST['Exercise'])) {
+
+            $model->attributes = $_POST['Exercise'];
+
+            $validate = true;
+
+            if (!empty($model->alloted_time)) {
+                if (
+                    empty($_POST['alloted_period']) ||
+                    !in_array($_POST['alloted_period'], array_keys(DateTimeHelper::PERIOD_IN_SECONDS)) ||
+                    !is_numeric($model->alloted_time)
+                ) {
+                    $validate = false;
+                    $model->addError('alloted_time', 'Если указано время, следует выбрать период');
+                } else {
+                    $model->alloted_time = $model->alloted_time * DateTimeHelper::PERIOD_IN_SECONDS[$_POST['alloted_period']];
+                }
+            }
+
+            if ($validate && $model->save())
+                $this->redirect(['view', 'id' => $model->id]);
         }
 
-        $this->render('create', array(
+        $this->render('create', [
             'model' => $model,
-        ));
+        ]);
     }
 
     /**
@@ -79,22 +99,18 @@ class UsersController extends Controller
     {
         $model = $this->loadModel($id);
 
-
         // Uncomment the following line if AJAX validation is needed
         // $this->performAjaxValidation($model);
 
-        if (isset($_POST['Users'])) {
-            $model->attributes = $_POST['Users'];
-            if ($model->validate()) {
-                $model->password = CPasswordHelper::hashPassword($model->password);
-            }
+        if (isset($_POST['Exercise'])) {
+            $model->attributes = $_POST['Exercise'];
             if ($model->save())
-                $this->redirect(array('view', 'id' => $model->id));
+                $this->redirect(['view', 'id' => $model->id]);
         }
-        $model->password = '';
-        $this->render('update', array(
+
+        $this->render('update', [
             'model' => $model,
-        ));
+        ]);
     }
 
     /**
@@ -108,7 +124,7 @@ class UsersController extends Controller
 
         // if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
         if (!isset($_GET['ajax']))
-            $this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
+            $this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : ['admin']);
     }
 
     /**
@@ -116,10 +132,10 @@ class UsersController extends Controller
      */
     public function actionIndex()
     {
-        $dataProvider = new CActiveDataProvider('Users');
-        $this->render('index', array(
+        $dataProvider = new CActiveDataProvider('Exercise');
+        $this->render('index', [
             'dataProvider' => $dataProvider,
-        ));
+        ]);
     }
 
     /**
@@ -127,26 +143,26 @@ class UsersController extends Controller
      */
     public function actionAdmin()
     {
-        $model = new Users('search');
+        $model = new Exercise('search');
         $model->unsetAttributes();  // clear any default values
-        if (isset($_GET['Users']))
-            $model->attributes = $_GET['Users'];
+        if (isset($_GET['Exercise']))
+            $model->attributes = $_GET['Exercise'];
 
-        $this->render('admin', array(
+        $this->render('admin', [
             'model' => $model,
-        ));
+        ]);
     }
 
     /**
      * Returns the data model based on the primary key given in the GET variable.
      * If the data model is not found, an HTTP exception will be raised.
      * @param integer $id the ID of the model to be loaded
-     * @return Users the loaded model
+     * @return Exercise the loaded model
      * @throws CHttpException
      */
     public function loadModel($id)
     {
-        $model = Users::model()->findByPk($id);
+        $model = Exercise::model()->findByPk($id);
         if ($model === null)
             throw new CHttpException(404, 'The requested page does not exist.');
         return $model;
@@ -154,11 +170,11 @@ class UsersController extends Controller
 
     /**
      * Performs the AJAX validation.
-     * @param Users $model the model to be validated
+     * @param Exercise $model the model to be validated
      */
     protected function performAjaxValidation($model)
     {
-        if (isset($_POST['ajax']) && $_POST['ajax'] === 'users-form') {
+        if (isset($_POST['ajax']) && $_POST['ajax'] === 'exercise-form') {
             echo CActiveForm::validate($model);
             Yii::app()->end();
         }

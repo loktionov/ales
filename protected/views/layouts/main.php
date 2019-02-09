@@ -1,55 +1,144 @@
-<?php /* @var $this Controller */ ?>
+<?php
+
+// setup versions
+$bootstrapVersion = "3.0.0";
+$fontAwesomeVersion = "3.2.1";
+$jqueryVersion = "2.0.3";
+$queryUiVersion = "1.10.3";
+
+// setup scriptmap for jquery and jquery-ui cdn
+$cs = Yii::app()->clientScript;
+$cs->scriptMap["jquery.js"] = "//ajax.googleapis.com/ajax/libs/jquery/$jqueryVersion/jquery.min.js";
+$cs->scriptMap["jquery.min.js"] = $cs->scriptMap["jquery.js"];
+$cs->scriptMap["jquery-ui.min.js"] = "//ajax.googleapis.com/ajax/libs/jqueryui/$queryUiVersion/jquery-ui.min.js";
+
+// fix jquery.ba-bbq.js for jquery 1.9+ (removed $.browser)
+// https://github.com/joshlangner/jquery-bbq/blob/master/jquery.ba-bbq.min.js
+$cs->scriptMap["jquery.ba-bbq.js"] = Yii::app()->baseUrl . "/js/jquery.ba-bbq.min.js";
+
+// register js files
+$cs->registerCoreScript('jquery');
+$cs->registerScriptFile("//netdna.bootstrapcdn.com/bootstrap/$bootstrapVersion/js/bootstrap.min.js", CClientScript::POS_END);
+$cs->registerScriptFile(Yii::app()->baseUrl . "/js/main.js", CClientScript::POS_END);
+
+?>
+
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta name="language" content="ru">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-    <!-- blueprint CSS framework -->
-    <link rel="stylesheet" type="text/css" href="<?= Yii::app()->request->baseUrl; ?>/css/screen.css"
-          media="screen, projection">
-    <link rel="stylesheet" type="text/css" href="<?= Yii::app()->request->baseUrl; ?>/css/print.css"
-          media="print">
-    <!--[if lt IE 8]>
-    <link rel="stylesheet" type="text/css" href="<?= Yii::app()->request->baseUrl; ?>/css/ie.css"
-          media="screen, projection">
-    <![endif]-->
+    <!-- CSS -->
+    <link href="//netdna.bootstrapcdn.com/bootstrap/<?php echo $bootstrapVersion; ?>/css/bootstrap.min.css"
+          rel="stylesheet">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/<?php echo $fontAwesomeVersion; ?>/css/font-awesome.min.css"
+          rel="stylesheet">
+    <link href="<?php echo Yii::app()->baseUrl; ?>/css/main.css" rel="stylesheet">
+    <link href="<?php echo Yii::app()->baseUrl; ?>/css/my.css" rel="stylesheet">
 
-    <link rel="stylesheet" type="text/css" href="<?= Yii::app()->request->baseUrl; ?>/css/main.css">
-    <link rel="stylesheet" type="text/css" href="<?= Yii::app()->request->baseUrl; ?>/css/form.css">
+    <!-- Javascript -->
+    <script>var baseUrl = "<?php echo Yii::app()->baseUrl; ?>";</script>
 
-    <title><?= CHtml::encode($this->pageTitle); ?></title>
+    <!-- NOTE: Yii uses this title element for its asset manager, so keep it last -->
+    <title><?php echo CHtml::encode($this->pageTitle); ?></title>
 </head>
 
 <body>
+<div class="container">
+    <nav class="navbar navbar-default" role="navigation">
 
-<div class="container" id="page">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
 
-    <div id="header">
-        <div id="logo"><?= CHtml::encode(Yii::app()->name); ?></div>
-    </div><!-- header -->
+            <a class="navbar-brand"
+               href="<?= Yii::app()->createAbsoluteUrl(Yii::app()->baseUrl); ?>"><?= Yii::app()->name; ?></a>
+        </div>
 
-    <div id="mainmenu">
-        <?php $this->widget('zii.widgets.CMenu', [
-            'items' => [
-                ['label' => 'Home', 'url' => ['/site/index']],
-                ['label' => 'Login', 'url' => ['/site/login'], 'visible' => Yii::app()->user->isGuest],
-                ['label' => 'Logout (' . Yii::app()->user->name . ')', 'url' => ['/site/logout'], 'visible' => !Yii::app()->user->isGuest]
-            ],
-        ]); ?>
-    </div><!-- mainmenu -->
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <!-- Main nav -->
+            <?php $this->widget('zii.widgets.CMenu', [
+                'htmlOptions' => ['class' => 'nav navbar-nav'],
+                'items' => [
+
+                ],
+            ]); ?>
+
+            <!-- Right nav -->
+            <?php $this->widget('zii.widgets.CMenu', [
+                'htmlOptions' => ['class' => 'nav navbar-nav pull-right'],
+                'items' => [
+                    ['label' => 'Login', 'url' => ['/site/login'], 'visible' => Yii::app()->user->isGuest],
+                    ['label' => 'Logout (' . Yii::app()->user->name . ')', 'url' => ['/site/logout'], 'visible' => !Yii::app()->user->isGuest]
+                ],
+            ]); ?>
+        </div><!-- /.navbar-collapse -->
+    </nav>
+</div>
+
+<div class="container">
+
+    <?php // NOTE: this does not use bootstrap's breadcrumbs component because CBreadcrumbs doesn't use UL/LI ?>
+    <?php // You can implement it yourself or use Chris83's - http://www.yiiframework.com/extension/bootstrap/ ?>
     <?php if (isset($this->breadcrumbs)): ?>
         <?php $this->widget('zii.widgets.CBreadcrumbs', [
             'links' => $this->breadcrumbs,
-        ]); ?><!-- breadcrumbs -->
+        ]); ?>
     <?php endif ?>
 
-    <?= $content; ?>
+    <div id="main-content">
 
-    <div class="clear"></div>
+        <?php if (!$this->menu): ?>
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <?= $content; ?>
+                </div>
+            </div>
+
+        <?php else: ?>
+
+            <div class="row">
+                <div class="col-lg-10">
+                    <?= $content; ?>
+                </div>
+
+                <div class="col-lg-2">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">Operations</div>
+                        <?php
+                        $this->widget('zii.widgets.CMenu', [
+                            'items' => $this->menu,
+                            'htmlOptions' => ['class' => 'nav nav-pills nav-stacked'],
+                        ]);
+                        ?>
+                    </div>
+                </div>
+            </div>
+
+        <?php endif; ?>
 
 
-</div><!-- page -->
+    </div> <!-- /#main-content -->
+
+    <hr>
+
+    <footer>
+        <p>
+
+        </p>
+    </footer>
+
+</div> <!-- /.container -->
 
 </body>
 </html>

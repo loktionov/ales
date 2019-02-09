@@ -2,34 +2,48 @@
 
 class SiteController extends Controller
 {
+
+    public $defaultAction = 'error';
+
     /**
-     * Declares class-based actions.
+     * @return array action filters
      */
-    public function actions()
+    public function filters()
     {
         return array(
-            // captcha action renders the CAPTCHA image displayed on the contact page
-            'captcha' => array(
-                'class' => 'CCaptchaAction',
-                'backColor' => 0xFFFFFF,
-            ),
-            // page action renders "static" pages stored under 'protected/views/site/pages'
-            // They can be accessed via: index.php?r=site/page&view=FileName
-            'page' => array(
-                'class' => 'CViewAction',
-            ),
+            'accessControl', // perform access control for CRUD operations
+            'postOnly + delete', // we only allow deletion via POST request
         );
     }
 
     /**
-     * This is the default 'index' action that is invoked
-     * when an action is not explicitly requested by users.
+     * Specifies the access control rules.
+     * This method is used by the 'accessControl' filter.
+     * @return array access control rules
      */
-    public function actionIndex()
+    public function accessRules()
     {
-        // renders the view file 'protected/views/site/index.php'
-        // using the default layout 'protected/views/layouts/main.php'
-        $this->render('index');
+        return [
+            [
+                'allow',
+                'actions' => ['error'],
+                'users' => ['*'],
+            ],
+            [
+                'allow',
+                'actions' => ['login'],
+                'users' => ['?'],
+            ],
+            [
+                'allow',
+                'actions' => ['logout'],
+                'users' => ['@'],
+            ],
+            [
+                'deny',  // deny all users
+                'users' => ['*'],
+            ],
+        ];
     }
 
     /**
@@ -42,6 +56,8 @@ class SiteController extends Controller
                 echo $error['message'];
             else
                 $this->render('error', $error);
+        } else {
+            throw new CHttpException(404, 'Страница не найдена');
         }
     }
 

@@ -1,5 +1,3 @@
-/themes
-/assets
+/.idea
 /vendor
 composer.lock
-/.idea

@@ -8,7 +8,8 @@
 return [
     'basePath' => dirname(__FILE__) . DIRECTORY_SEPARATOR . '..',
     'name' => 'Дневник',
-
+    'defaultController' => 'journal',
+    'language' => 'ru',
     // preloading 'log' component
     'preload' => ['log'],
 

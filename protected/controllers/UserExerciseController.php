@@ -1,6 +1,6 @@
 <?php
 
-class UsersController extends Controller
+class UserExerciseController extends Controller
 {
     /**
      * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
@@ -53,14 +53,13 @@ class UsersController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Users;
+        $model = new UserExercise;
 
         // Uncomment the following line if AJAX validation is needed
         // $this->performAjaxValidation($model);
 
-        if (isset($_POST['Users'])) {
-            $model->attributes = $_POST['Users'];
-            $model->password = CPasswordHelper::hashPassword($model->password);
+        if (isset($_POST['UserExercise'])) {
+            $model->attributes = $_POST['UserExercise'];
             if ($model->save())
                 $this->redirect(array('view', 'id' => $model->id));
         }
@@ -79,19 +78,15 @@ class UsersController extends Controller
     {
         $model = $this->loadModel($id);
 
-
         // Uncomment the following line if AJAX validation is needed
         // $this->performAjaxValidation($model);
 
-        if (isset($_POST['Users'])) {
-            $model->attributes = $_POST['Users'];
-            if ($model->validate()) {
-                $model->password = CPasswordHelper::hashPassword($model->password);
-            }
+        if (isset($_POST['UserExercise'])) {
+            $model->attributes = $_POST['UserExercise'];
             if ($model->save())
                 $this->redirect(array('view', 'id' => $model->id));
         }
-        $model->password = '';
+
         $this->render('update', array(
             'model' => $model,
         ));
@@ -116,7 +111,7 @@ class UsersController extends Controller
      */
     public function actionIndex()
     {
-        $dataProvider = new CActiveDataProvider('Users');
+        $dataProvider = new CActiveDataProvider('UserExercise');
         $this->render('index', array(
             'dataProvider' => $dataProvider,
         ));
@@ -127,10 +122,10 @@ class UsersController extends Controller
      */
     public function actionAdmin()
     {
-        $model = new Users('search');
+        $model = new UserExercise('search');
         $model->unsetAttributes();  // clear any default values
-        if (isset($_GET['Users']))
-            $model->attributes = $_GET['Users'];
+        if (isset($_GET['UserExercise']))
+            $model->attributes = $_GET['UserExercise'];
 
         $this->render('admin', array(
             'model' => $model,
@@ -141,12 +136,12 @@ class UsersController extends Controller
      * Returns the data model based on the primary key given in the GET variable.
      * If the data model is not found, an HTTP exception will be raised.
      * @param integer $id the ID of the model to be loaded
-     * @return Users the loaded model
+     * @return UserExercise the loaded model
      * @throws CHttpException
      */
     public function loadModel($id)
     {
-        $model = Users::model()->findByPk($id);
+        $model = UserExercise::model()->findByPk($id);
         if ($model === null)
             throw new CHttpException(404, 'The requested page does not exist.');
         return $model;
@@ -154,11 +149,11 @@ class UsersController extends Controller
 
     /**
      * Performs the AJAX validation.
-     * @param Users $model the model to be validated
+     * @param UserExercise $model the model to be validated
      */
     protected function performAjaxValidation($model)
     {
-        if (isset($_POST['ajax']) && $_POST['ajax'] === 'users-form') {
+        if (isset($_POST['ajax']) && $_POST['ajax'] === 'user-exercise-form') {
             echo CActiveForm::validate($model);
             Yii::app()->end();
         }
