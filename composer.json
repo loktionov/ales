@@ -1,0 +1,15 @@
+{
+    "require": {
+        "php" : ">=5.6",
+        "yiisoft/yii": "^1.1"
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "@migrate",
+            "git rev-parse HEAD > ./protected/runtime/webapp.version"
+        ],
+        "migrate": [
+            "php ./protected/yiic migrate up --interactive=0"
+        ]
+    }
+}
