@@ -22,11 +22,11 @@ return [
     'modules' => [
         // uncomment the following to enable the Gii tool
 
-        'gii' => [
+        /*'gii' => [
             'class' => 'system.gii.GiiModule',
             'password' => '1',
             'ipFilters' => ['127.0.0.1', '::1'],
-        ],
+        ],*/
 
     ],
 
